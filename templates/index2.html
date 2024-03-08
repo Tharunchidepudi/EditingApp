@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Downloader</title>
+    <style>
+        .loader {
+          border: 16px solid #f3f3f3;
+          border-radius: 50%;
+          border-top: 16px solid #3498db;
+          width: 100px;
+          height: 100px;
+          margin-top: 10px;
+          margin-bottom: 10px;
+          -webkit-animation: spin 2s linear infinite; /* Safari */
+          animation: spin 2s linear infinite;
+        }
+        
+        /* Safari */
+        @-webkit-keyframes spin {
+          0% { -webkit-transform: rotate(0deg); }
+          100% { -webkit-transform: rotate(360deg); }
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        </style>
+    
+</head>
+<body>
+    <h1>YouTube Video Downloader</h1>
+    <input type="text" id="videoUrl" placeholder="Enter YouTube Video URL">
+    <input type="text" id="Timestamp" placeholder="Enter Desired Timestamps">
+    
+    <button onclick="downloadVideo()">Download</button>
+    <p id="downloadLink"></p>
+
+    <script>
+        function downloadVideo() {
+            var videoUrl = document.getElementById('videoUrl').value;
+            var timestamps = document.getElementById('Timestamp').value;
+            var loader= document.createElement("div");
+            var load= document.createElement("div");
+            var text= document.createElement("div");
+            load.setAttribute("class","loader");
+            loader.appendChild(load);
+            loader.setAttribute("id","loading");
+            document.body.appendChild(loader);
+            fetch('/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({link: videoUrl,time:timestamps})
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                var url = URL.createObjectURL(blob);
+        
+                var downlink= document.getElementById("downloadLink").value
+                console.log(downlink)
+                var a = document.createElement('a');
+                a.setAttribute("id","anchor")
+                a.href = url;
+                a.download = 'video.mp4'; // Set the default download filename
+                a.textContent = 'Download video';
+                document.getElementById("loading").remove();
+                if(!document.getElementById("anchor")){
+                    document.getElementById('downloadLink').appendChild(a);
+                }
+                
+                
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
